@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<catalog>
+    <item>
+        <entity_id>6829</entity_id>
+        <CategoryName><![CDATA[New Products]]></CategoryName>
+        <sku>KND17221</sku>
+        <name><![CDATA[KIND Plus Nutrition Boost Bar Pomegranate Blueberry Pistachio with Antioxidants 12ct]]></name>
+        <description></description>
+        <shortdesc><![CDATA[An all-natural, wholesome mix of fruit and nuts sweetened with honey plus a nutritional boost. Made from ingredients you can see and pronounce. Each bar contains 50% of the recommended daily intake of vitamins A, C and E.]]></shortdesc>
+        <price>26.9900</price>
+        <link>http://www.coffeeforless.com/kind-plus-nutrition-boost-bar-pomegranate-blueberry-pistachio-with-antioxidants-12ct.html</link>
+        <image>http://mcdn.coffeeforless.com/media/catalog/product//k/n/knd17221_a.jpg</image>
+        <Brand><![CDATA[KIND]]></Brand>
+        <Rating></Rating>
+        <CaffeineType></CaffeineType>
+        <Count>12</Count>
+        <Flavored></Flavored>
+        <Seasonal></Seasonal>
+        <Instock>Yes</Instock>
+        <Facebook>1</Facebook>
+        <IsKCup>0</IsKCup>
+    </item>
+    
+</catalog>    
