@@ -2,9 +2,12 @@
 
 namespace App\Commands;
 
+use App\Services\DatabaseService\DatabaseService;
+use App\Services\DatabaseService\MysqlDatabase;
+use App\Services\DatabaseService\PostgresDatabase;
+use App\Services\DatabaseService\SqliteDatabase;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
-use Illuminate\Support\Facades\DB;
 use LaravelZero\Framework\Commands\Command;
 
 /**
@@ -16,7 +19,6 @@ use LaravelZero\Framework\Commands\Command;
  */
 class XmlParserCommand extends Command implements PromptsForMissingInput
 {
-
     /**
      * The signature of the command.
      *
@@ -55,57 +57,102 @@ class XmlParserCommand extends Command implements PromptsForMissingInput
         $db = $this->option('db');
         $xml = simplexml_load_file($this->argument('xml')) or die('Error: Cannot create xml object');
 
-
         foreach ($xml->children() as $product) {
-            $entityId = $product->entity_id;
+            $entityId = (int) $product->entity_id;
             $category = $product->CategoryName;
-            $sku = $product->sku;
+            $sku = (int) $product->sku;
             $name = $product->name;
             $description = $product->description;
             $shortDescription = $product->shortdesc;
-            $price = $product->price;
+            $price = (float) $product->price;
             $link = $product->link;
             $image = $product->image;
             $brand = $product->Brand;
-            $rating = $product->Rating;
+            $rating = (int) $product->Rating;
             $caffeineType = $product->CaffeineType;
-            $count = $product->Count;
-            $flavored = $product->Flavored;
-            $seasonal = $product->Seasonal;
-            $inStock = $product->Instock;
-            $facebook = $product->Facebook;
-            $isKCup = $product->IsKCup;
+            $count = (int) $product->Count;
+            $flavored = (bool) $product->Flavored;
+            $seasonal = (bool) $product->Seasonal;
+            $inStock = (bool) $product->Instock;
+            $facebook = (bool) $product->Facebook;
+            $isKCup = (bool) $product->IsKCup;
 
-
-            DB::table('products')->insert(
-              [
-                  'id' => $entityId,
-                  'category' => $category,
-                  'sku' => $sku,
-                  'name' => $name,
-                  'description' => $description,
-                  'short_description' => $shortDescription,
-                  'price' => $price,
-                  'link' => $link,
-                  'image' => $image,
-                  'brand' => $brand,
-                  'rating' => $rating,
-                  'caffeine_type' => $caffeineType,
-                  'count' => $count,
-                  'flavored' => $flavored,
-                  'seasonal' => $seasonal,
-                  'in_stock' => $inStock,
-                  'facebook' => $facebook,
-                  'is_k_cup' => $isKCup,
-              ]
-            );
+            if ($db === 'sqlite') {
+                (new DatabaseService( new SqliteDatabase()))
+                ->save(
+                    $entityId,
+                    $category,
+                    $sku,
+                    $name,
+                    $description,
+                    $shortDescription,
+                    $price,
+                    $link,
+                    $image,
+                    $brand,
+                    $rating,
+                    $caffeineType,
+                    $count,
+                    $flavored,
+                    $seasonal,
+                    $inStock,
+                    $facebook,
+                    $isKCup
+                );
+            } elseif ($db === 'mysql') {
+                (new DatabaseService( new MysqlDatabase()))
+                    ->save(
+                        $entityId,
+                        $category,
+                        $sku,
+                        $name,
+                        $description,
+                        $shortDescription,
+                        $price,
+                        $link,
+                        $image,
+                        $brand,
+                        $rating,
+                        $caffeineType,
+                        $count,
+                        $flavored,
+                        $seasonal,
+                        $inStock,
+                        $facebook,
+                        $isKCup
+                    );
+            } elseif ($db === 'postgres') {
+                (new DatabaseService( new PostgresDatabase()))
+                    ->save(
+                        $entityId,
+                        $category,
+                        $sku,
+                        $name,
+                        $description,
+                        $shortDescription,
+                        $price,
+                        $link,
+                        $image,
+                        $brand,
+                        $rating,
+                        $caffeineType,
+                        $count,
+                        $flavored,
+                        $seasonal,
+                        $inStock,
+                        $facebook,
+                        $isKCup
+                    );
+            } else {
+                $this->error('Invalid database type. Please use --db option to specify a valid database type.');
+            }
         }
     }
 
     /**
      * Define the command's schedule.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+     * @param Schedule $schedule
      * @return void
      */
     public function schedule(Schedule $schedule): void
