@@ -11,6 +11,8 @@ use App\Services\DatabaseService\SqliteDatabase;
 use Exception;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 use LaravelZero\Framework\Commands\Command;
 
 /**
@@ -58,6 +60,7 @@ class XmlParserCommand extends Command implements PromptsForMissingInput
     public function handle()
     {
         try {
+            $startTime = Carbon::now()->toDateTimeString();
 
             $this->info('Welcome to the XML Parser Command');
             $this->newLine(1);
@@ -78,6 +81,9 @@ class XmlParserCommand extends Command implements PromptsForMissingInput
             // Throw an error if the xml file is not found or has invalid data.
             $xml = simplexml_load_file($this->argument('xml'));
             throw_if($xml == false, new InvalidXmlException());
+
+            // logging the execution of the command.
+            Log::info(sprintf('parse_request::xml::begin || Filename: %s || database: %s || Time of execution: %s', $this->argument('xml'), $db, $startTime));
 
             $this->info('Data parsing is complete. Saving data to database...');
             $this->newLine(1);
@@ -171,13 +177,18 @@ class XmlParserCommand extends Command implements PromptsForMissingInput
                         );
                 }
             });
+            $endTime = now()->toDateTimeString();
+            $this->newLine(2);
+            $this->info('Congratulations. Data has been successfully saved to the database.');
+            Log::info(sprintf('id: parse_request::xml::end || Filename: %s || database: %s || Time of execution: %s || Elapsed time: %s', $this->argument('xml'), $db, $endTime, Carbon::parse($startTime)->diffAsCarbonInterval($endTime)));
+
         } catch (InvalidDatabaseException| InvalidXmlException|Exception $e) {
-            $this->error($e->getMessage());
+            Log::error($e->getMessage());
+            $this->newLine(1);
+            $this->error('Error occurred. || ' . $e->getMessage());
+            $this->newLine(1);
+            $this->info('Please check the error log for more details and try again.');
         }
-
-        $this->newLine(2);
-        $this->info('Congratulations. Data has been successfully saved to the database.');
-
     }
 
     /**

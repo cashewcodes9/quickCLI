@@ -3,7 +3,9 @@
 namespace App\Services\DatabaseService;
 
 use App\Interfaces\DatabaseInterface;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * SqliteDatabase Class
@@ -45,29 +47,33 @@ class SqliteDatabase implements DatabaseInterface
         bool $isKCup
     ): string
     {
-        // TODO: use try catch block to catch any exceptions. And do logging.
-        DB::table('products')->insert(
-            [
-                'id' => $entityId,
-                'category' => $category,
-                'sku' => $sku,
-                'name' => $name,
-                'description' => $description,
-                'short_description' => $shortDescription,
-                'price' => $price,
-                'link' => $link,
-                'image' => $image,
-                'brand' => $brand,
-                'rating' => $rating,
-                'caffeine_type' => $caffeineType,
-                'count' => $count,
-                'flavored' => $flavored,
-                'seasonal' => $seasonal,
-                'in_stock' => $inStock,
-                'facebook' => $facebook,
-                'is_k_cup' => $isKCup,
-            ]
-        );
-        return 'Data saved to sqlite database.';
+        try {
+            DB::table('products')->insert(
+                [
+                    'id' => $entityId,
+                    'category' => $category,
+                    'sku' => $sku,
+                    'name' => $name,
+                    'description' => $description,
+                    'short_description' => $shortDescription,
+                    'price' => $price,
+                    'link' => $link,
+                    'image' => $image,
+                    'brand' => $brand,
+                    'rating' => $rating,
+                    'caffeine_type' => $caffeineType,
+                    'count' => $count,
+                    'flavored' => $flavored,
+                    'seasonal' => $seasonal,
+                    'in_stock' => $inStock,
+                    'facebook' => $facebook,
+                    'is_k_cup' => $isKCup,
+                ]
+            );
+            return 'Data saved to sqlite database.';
+        } catch (UniqueConstraintViolationException|\Exception $e ) {
+            Log::error('Error while saving data to sqlite database: ' . $e->getMessage());
+            throw $e;
+        }
     }
 }
