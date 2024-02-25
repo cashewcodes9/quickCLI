@@ -36,6 +36,11 @@ You can follow these steps to get started with the project.
 <p>To run tests  </p>
 
 
+
+## Help
+<p> You can list all the available commands with: </p>
+    
+            php quick-cli list
 ## License
 
 Laravel Zero is an open-source software licensed under the MIT license.
