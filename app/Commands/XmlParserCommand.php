@@ -2,10 +2,13 @@
 
 namespace App\Commands;
 
+use App\Exceptions\InvalidDatabaseException;
+use App\Exceptions\InvalidXmlException;
 use App\Services\DatabaseService\DatabaseService;
 use App\Services\DatabaseService\MysqlDatabase;
 use App\Services\DatabaseService\PostgresDatabase;
 use App\Services\DatabaseService\SqliteDatabase;
+use Exception;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 use LaravelZero\Framework\Commands\Command;
@@ -54,99 +57,127 @@ class XmlParserCommand extends Command implements PromptsForMissingInput
      */
     public function handle()
     {
-        $db = $this->option('db');
-        $xml = simplexml_load_file($this->argument('xml')) or die('Error: Cannot create xml object');
+        try {
 
-        foreach ($xml->children() as $product) {
-            $entityId = (int) $product->entity_id;
-            $category = $product->CategoryName;
-            $sku = (int) $product->sku;
-            $name = $product->name;
-            $description = $product->description;
-            $shortDescription = $product->shortdesc;
-            $price = (float) $product->price;
-            $link = $product->link;
-            $image = $product->image;
-            $brand = $product->Brand;
-            $rating = (int) $product->Rating;
-            $caffeineType = $product->CaffeineType;
-            $count = (int) $product->Count;
-            $flavored = (bool) $product->Flavored;
-            $seasonal = (bool) $product->Seasonal;
-            $inStock = (bool) $product->Instock;
-            $facebook = (bool) $product->Facebook;
-            $isKCup = (bool) $product->IsKCup;
+            $this->info('Welcome to the XML Parser Command');
+            $this->newLine(1);
+            $this->info('You are about to parse the following xml file: ' . $this->argument('xml'));
 
-            if ($db === 'sqlite') {
-                (new DatabaseService( new SqliteDatabase()))
-                ->save(
-                    $entityId,
-                    $category,
-                    $sku,
-                    $name,
-                    $description,
-                    $shortDescription,
-                    $price,
-                    $link,
-                    $image,
-                    $brand,
-                    $rating,
-                    $caffeineType,
-                    $count,
-                    $flavored,
-                    $seasonal,
-                    $inStock,
-                    $facebook,
-                    $isKCup
-                );
-            } elseif ($db === 'mysql') {
-                (new DatabaseService( new MysqlDatabase()))
-                    ->save(
-                        $entityId,
-                        $category,
-                        $sku,
-                        $name,
-                        $description,
-                        $shortDescription,
-                        $price,
-                        $link,
-                        $image,
-                        $brand,
-                        $rating,
-                        $caffeineType,
-                        $count,
-                        $flavored,
-                        $seasonal,
-                        $inStock,
-                        $facebook,
-                        $isKCup
-                    );
-            } elseif ($db === 'postgres') {
-                (new DatabaseService( new PostgresDatabase()))
-                    ->save(
-                        $entityId,
-                        $category,
-                        $sku,
-                        $name,
-                        $description,
-                        $shortDescription,
-                        $price,
-                        $link,
-                        $image,
-                        $brand,
-                        $rating,
-                        $caffeineType,
-                        $count,
-                        $flavored,
-                        $seasonal,
-                        $inStock,
-                        $facebook,
-                        $isKCup
-                    );
-            } else {
-                $this->error('Invalid database type. Please use --db option to specify a valid database type.');
-            }
+            $this->newLine(1);
+            $this->info('Checking database type...');
+            $db = $this->option('db');
+            throw_if(!in_array($db, ['sqlite', 'mysql', 'postgres']), new InvalidDatabaseException());
+
+            $this->newLine(1);
+            $this->info('Valid database type. Database type: ' . $db);
+
+            $this->newLine(1);
+            $this->info('The parsing of your data is about to start. Please wait...');
+            $this->newLine(1);
+
+            // Throw an error if the xml file is not found or has invalid data.
+            $xml = simplexml_load_file($this->argument('xml'));
+            throw_if($xml == false, new InvalidXmlException());
+
+            $this->info('Data parsing is complete. Saving data to database...');
+            $this->newLine(1);
+
+            // Loop through the xml data and save it to the database.
+            $this->withProgressBar($xml->children(), function ($product) use ($db) {
+                $entityId = (int) $product->entity_id;
+                $category = $product->CategoryName;
+                $sku = (int) $product->sku;
+                $name = $product->name;
+                $description = $product->description;
+                $shortDescription = $product->shortdesc;
+                $price = (float) $product->price;
+                $link = $product->link;
+                $image = $product->image;
+                $brand = $product->Brand;
+                $rating = (int) $product->Rating;
+                $caffeineType = $product->CaffeineType;
+                $count = (int) $product->Count;
+                $flavored = (bool) $product->Flavored;
+                $seasonal = (bool) $product->Seasonal;
+                $inStock = (bool) $product->Instock;
+                $facebook = (bool) $product->Facebook;
+                $isKCup = (bool) $product->IsKCup;
+
+                if ($db === 'sqlite') {
+                    (new DatabaseService( new SqliteDatabase()))
+                        ->save(
+                            $entityId,
+                            $category,
+                            $sku,
+                            $name,
+                            $description,
+                            $shortDescription,
+                            $price,
+                            $link,
+                            $image,
+                            $brand,
+                            $rating,
+                            $caffeineType,
+                            $count,
+                            $flavored,
+                            $seasonal,
+                            $inStock,
+                            $facebook,
+                            $isKCup
+                        );
+                } elseif ($db === 'mysql') {
+                    (new DatabaseService( new MysqlDatabase()))
+                        ->save(
+                            $entityId,
+                            $category,
+                            $sku,
+                            $name,
+                            $description,
+                            $shortDescription,
+                            $price,
+                            $link,
+                            $image,
+                            $brand,
+                            $rating,
+                            $caffeineType,
+                            $count,
+                            $flavored,
+                            $seasonal,
+                            $inStock,
+                            $facebook,
+                            $isKCup
+                        );
+                } elseif ($db === 'postgres') {
+                    (new DatabaseService( new PostgresDatabase()))
+                        ->save(
+                            $entityId,
+                            $category,
+                            $sku,
+                            $name,
+                            $description,
+                            $shortDescription,
+                            $price,
+                            $link,
+                            $image,
+                            $brand,
+                            $rating,
+                            $caffeineType,
+                            $count,
+                            $flavored,
+                            $seasonal,
+                            $inStock,
+                            $facebook,
+                            $isKCup,
+                        );
+                }
+            });
+        } catch (InvalidDatabaseException| InvalidXmlException|Exception $e) {
+            $this->error($e->getMessage());
         }
+
+        $this->newLine(2);
+        $this->info('Congratulations. Data has been successfully saved to the database.');
+
     }
 
     /**
