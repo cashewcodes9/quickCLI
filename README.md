@@ -33,7 +33,10 @@ You can follow these steps to get started with the project.
         php quick-cli parse:xml <path-to-xml-file>
 
 #### Run the tests
-<p>To run tests  </p>
+<p>A php testing framework <b>Pest</b> is being used to test the application. To run the tests, run the following command: </p>
+
+        ./vendor/bin/phpunit
+
 
 
 
@@ -41,6 +44,11 @@ You can follow these steps to get started with the project.
 <p> You can list all the available commands with: </p>
     
             php quick-cli list
+
+## Testing
+
+
+
 ## License
 
 Laravel Zero is an open-source software licensed under the MIT license.
