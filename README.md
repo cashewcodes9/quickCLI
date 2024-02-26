@@ -37,7 +37,10 @@ You can follow these steps to get started with the project.
 
         ./vendor/bin/phpunit
 
+#### PhpStan static analysis
+<p> PhpStan is a static analysis tool that helps to find bugs in the code. To run the static analysis, run the following command: </p>
 
+        vendor/bin/phpstan analyse app config database tests --memory-limit 500M
 
 
 ## Help
