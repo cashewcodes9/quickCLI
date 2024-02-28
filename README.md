@@ -54,6 +54,8 @@ You can follow these steps to get started with the project.
 
 ![quick-cli-demo.png](storage%2Fimages%2Fquick-cli-demo.png)
 
+#### Database overview
+![database-screenshot.png](storage%2Fimages%2Fdatabase-screenshot.png)
 
 ## License
 
