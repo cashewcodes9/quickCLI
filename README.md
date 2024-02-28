@@ -48,8 +48,11 @@ You can follow these steps to get started with the project.
     
             php quick-cli list
 
-## Testing
+## Screenshots
 
+#### Run command to save feed.xml into sqlite database
+
+![quick-cli-demo.png](storage%2Fimages%2Fquick-cli-demo.png)
 
 
 ## License
